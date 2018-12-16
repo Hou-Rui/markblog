@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<html>
+
+<head>
+    <title>MarkBlog</title>
+</head>
+
+<body>
+    <article id="mb-article" class="uk-flex-column">
+        <!-- 导航栏 -->
+        <nav id="mb-navbar" class="uk-navbar">
+            <a href="" class="uk-navbar-brand">MarkBlog</a>
+            <div class="uk-navbar-flip">
+                <a id="mb-sidebar-toggle" class="uk-navbar-toggle" data-uk-offcanvas="{target:'#mb-offcanvas'}"></a>
+            </div>
+        </nav>
+        <!-- 标题栏 -->
+        <h1 id="mb-article-title" class="uk-article-title">标题</h1>
+        <p id="mb-article-meta" class="uk-article-meta">其他信息</p>
+        <!-- 标签栏 -->
+        <div id="mb-tag-bar" class="uk-flex">
+            <button id="mb-add-tag-button" class="uk-button uk-button-mini">
+                <i class="uk-icon-plus"></i>&nbsp;添加标签
+            </button>
+            <div id="mb-tags-area" class="uk-flex"></div>
+        </div>
+        <!-- 工具栏 -->
+        <div id="mb-editor-toolbar" class="uk-grid-large">
+            <button id="mb-save-document" class="uk-button">
+                <i class="uk-icon-save"></i>&nbsp;保存
+            </button>
+            <button id="mb-show-modify-article-info-modal" class="uk-button">
+                <i class="uk-icon-pencil"></i>&nbsp;修改标题
+            </button>
+        </div>
+        <!-- 编辑器 -->
+        <textarea id="mb-editor"></textarea>
+    </article>
+    <!-- 侧栏 -->
+    <div id="mb-offcanvas" class="uk-offcanvas">
+        <div class="uk-offcanvas-bar">
+            <ul id="mb-offcanvas-nav" class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
+                <li>
+                    <a id="mb-search-link" href="javascript:void(0);" data-uk-toggle="{target:'#mb-search-panel'}">
+                        <i class="uk-icon-search"></i>&nbsp;搜索文档
+                    </a>
+                </li>
+                <div id="mb-search-panel" aria-hidden="true" class="uk-panel uk-hidden">
+                    <p>
+                        搜索标题：<input id="mb-search-title" class="mb-search-input" type="text" /> <br />
+                        必选标签：<input id="mb-search-tags-required" class="mb-search-input" type="text" /> <br />
+                        可选标签：<input id="mb-search-tags-optional" class="mb-search-input" type="text" /> <br />
+                    </p>
+                    <button id="mb-search-button" class="uk-button uk-button-primary uk-width-1-1">开始搜索</button>
+                    <ul id="mb-results-list" class="uk-nav uk-nav-offcanvas"></ul>
+                </div>
+                <li class="uk-nav-header">文档</li>
+                <ul id="mb-documents-list" class="uk-nav uk-nav-offcanvas"></ul>
+            </ul>
+        </div>
+    </div>
+    <!-- 对话框 -->
+    <div id="mb-modify-article-info-modal" class="uk-modal">
+        <div id="mb-modify-article-info-dialog" class="uk-modal-dialog">
+            <p>
+                标题：<input class="uk-width-1-1" id="mb-article-title-input" type="text" />
+                <p id="mb-title-empty-msg" class="uk-alert uk-alert-danger">标题不能为空</p>
+                附加信息：<input class="uk-width-1-1" id="mb-article-meta-input" type="text" />
+            </p>
+            <button id="mb-modify-article-info-okbutton" class="uk-button uk-button-primary">完成</button>
+        </div>
+    </div>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="lib/font-awesome.min.css" />
+    <!-- UIKit -->
+    <link rel="stylesheet" href="lib/uikit.almost-flat.min.css" />
+    <script src="lib/jquery.min.js"></script>
+    <script>if (typeof module === 'object') { window.jQuery = window.$ = module.exports }</script>
+    <script src="lib/uikit.min.js"></script>
+    <!-- SimpleMDE-->
+    <link rel="stylesheet" href="node_modules/simplemde/dist/simplemde.min.css">
+    <script src="node_modules/simplemde/dist/simplemde.min.js"></script>
+    <!-- MarkBlog -->
+    <link rel="stylesheet" href="styles/editor.css" />
+    <script src="scripts/editor.js"></script>
+</body>
+
+</html>

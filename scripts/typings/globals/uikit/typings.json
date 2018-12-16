@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/93cfad5738535b06352b4039a4ad128ec8ef2331/uikit/index.d.ts",
+    "raw": "registry:dt/uikit#2.27.0+20170120001024",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/93cfad5738535b06352b4039a4ad128ec8ef2331/uikit/index.d.ts"
+  }
+}

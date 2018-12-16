@@ -1,0 +1,58 @@
+body, html {
+    margin: 0px;
+}
+
+input {
+    height: 30px;
+    border: 1px solid #a0b3d6;
+    border-radius: 3px;
+    margin: 5px;
+}
+
+article {
+    height: 100%;
+}
+
+.mb-tag-class {
+    height: 18px;
+    line-height: 18px;
+    border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+
+#mb-add-tag-button {
+    border-radius: 10px;
+    font-size: 10px;
+}
+
+#mb-tag-bar {
+    height: 20px;
+    line-height: 20px;
+    font-size: 12px;
+    margin: 5px;
+    display: flex;
+}
+
+.mb-search-input {
+    height: 20px;
+    line-height: 20px;
+    background: #00000055;
+    border: 1px hidden;
+    border-radius: 3px;
+    color: white;
+}
+
+#mb-editor {
+    background-color: white;
+    border: 1px solid #a0b3d6;
+    border-radius: 3px;
+    line-height: 30px;
+    font-size: 18px;
+    margin: 5px;
+}
+
+#mb-editor-toolbar {
+    margin: 5px;
+}
