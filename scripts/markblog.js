@@ -1,27 +1,36 @@
 /* global SimpleMDE */
-// eslint-disable-next-line multiline-comment-style
+/* eslint-disable no-unused-vars */
+/* eslint-disable-next-line multiline-comment-style */
 /// <reference path="typings/index.d.ts" />
 /// <reference path="../node_modules/simplemde/src/js/simplemde.js" />
 
 'use strict'
 
 const fs = require('fs')
-const hashlib = require('./scripts/hashlib.js')
+const path = require('path')
+const util = require('./scripts/util.js')
 const arraylib = require('./scripts/arraylib.js')
 const electron = require('electron')
 const {remote} = electron
 
 var editor = new SimpleMDE({
+    autofocus: true,
     autoDownloadFontAwesome: false,
     status: false,
     spellChecker: false,
     toolbar: [
-        'bold', 'italic', 'heading', '|', 'quote', '|',
+        'bold', 'italic', 'heading', '|', 'quote', 'image', 'link', '|',
         {
             name: 'save',
             action: _ => saveDocument(),
             className: 'fa fa-save',
             title: '保存'
+        },
+        {
+            name: 'edit-document-info',
+            action: _ => showModifyArticleInfoModal(),
+            className: 'fa fa-pencil',
+            title: '修改文档信息'
         }
     ]
 })
@@ -41,7 +50,7 @@ var editor = new SimpleMDE({
  * @return {DocumentInfo} 文档信息
  */
 function getDocumentInfo(docname) {
-    if (!fs.existsSync(`${docname}/content.html`)) {
+    if (!fs.existsSync(`${docname}/content.md`)) {
         return null
     }
     try {
@@ -67,7 +76,7 @@ function createItemClickHandler(info) {
         for (var count in info.tags) {
             addTag(info.tags[count])
         }
-        var data = fs.readFileSync(`./documents/doc-${info.hash}/content.html`, 'utf-8')
+        var data = fs.readFileSync(`./documents/doc-${info.hash}/content.md`, 'utf-8')
         editor.value(data)
         $.UIkit.offcanvas.hide()
     }
@@ -93,8 +102,8 @@ function searchDocumentNames() {
             }
         }
     }
-    var unionCount = (x) => arraylib.union(x.tags, tagsOptional).length
-    searchResults.sort((a, b) => unionCount(b) - unionCount(a))
+    var intersectCount = (x) => arraylib.intersect(x.tags, tagsOptional).length
+    searchResults.sort((a, b) => intersectCount(b) - intersectCount(a))
     for (var index in searchResults) {
         var result = searchResults[index]
         var resultName = 'doc-' + result.hash
@@ -107,6 +116,10 @@ function searchDocumentNames() {
         }
         $(`#mb-result-${resultName}`).click(createItemClickHandler(result))
     }
+    if (searchResults.length === 0) {
+        element = '<li><p style="text-align:center;line-height:40px;">无搜索结果</p></li>'
+        $('#mb-results-list').append(element)
+    }
 }
 
 /**
@@ -115,12 +128,13 @@ function searchDocumentNames() {
  */
 function loadDocumentNames() {
     $('#mb-documents-list').html('')
+    $('#mb-results-list').html('')
     var files = fs.readdirSync('./documents')
     for (var fileIndex in files) {
         var docname = files[fileIndex]
         var info = getDocumentInfo(`./documents/${docname}`)
         if (info !== null) {
-            var element = `<li><a id="mb-item-${docname}" href="javascript:void(0);">
+            var element = `<li><a id="mb-item-${docname}" name="${docname}" class="mb-list-item" href="javascript:void(0);">
                 ${info.title}&nbsp;&nbsp;
             </a></li>`
             $('#mb-documents-list').append(element)
@@ -132,6 +146,28 @@ function loadDocumentNames() {
     }
 }
 
+function exportDocument() {
+    const options = {
+        title: '导出文档',
+        defaultPath: `${$('#mb-article-title').text()}`,
+        message: '导出为：HTML文档 或 MarkDown文档',
+        filters: [
+            {name: 'HTML文档', extensions: ['html']},
+            {name: 'MarkDown文档', extensions: ['md']}
+        ]
+    }
+    remote.dialog.showSaveDialog(options, (filename) => {
+        console.log(filename)
+        var extname = path.extname(filename)
+        if (extname === '.html') {
+            fs.writeFileSync(filename, '\ufeff' + editor.markdown(editor.value()), 'utf-8')
+        }
+        else if (extname === '.md') {
+            fs.writeFileSync(filename, '\ufeff' + editor.value(), 'utf-8')
+        }
+    })
+}
+
 /**
  * 显示修改文档信息对话框。在点击“修改信息”按钮时触发。
  * @return {void}
@@ -139,6 +175,9 @@ function loadDocumentNames() {
 function showModifyArticleInfoModal() {
     var modal = UIkit.modal('#mb-modify-article-info-modal')
     $('#mb-title-empty-msg').hide()
+    $('#mb-article-title-input').val($('#mb-article-title').text())
+    $('#mb-article-meta-input').val($('#mb-article-meta').text())
+    $('#mb-tags-input').val($('#mb-tags-area').text())
     modal.show()
 }
 
@@ -146,22 +185,26 @@ function modifyArticleInfo() {
     var modal = UIkit.modal('#mb-modify-article-info-modal')
     var newName = $('#mb-article-title-input').val()
     var newMeta = $('#mb-article-meta-input').val()
+    var newTags = $('#mb-tags-input').val()
     if (newName === '') {
         $('#mb-title-empty-msg').show()
         return
     }
     $('#mb-article-title').text(newName)
     $('#mb-article-meta').text(newMeta)
+    $('#mb-tags-area').html('')
+    var tags = newTags.split('#')
+    for (var index in tags) {
+        if (!util.isEmptyString(tags[index])) {
+            addTag(tags[index])
+        }
+    }
     modal.hide()
 }
 
 function addTag(tagName, target = '#mb-tags-area') {
-    var tag = `<div class="uk-badge mb-tag-class">#${tagName}</div>`
+    var tag = `<div class="uk-badge mb-tag-class">#${tagName.trim()}</div>&nbsp;`
     $(target).append(tag)
-}
-
-function showAddTagDialog() {
-    UIkit.modal.prompt('新建标签：', '', (tagName) => addTag(tagName))
 }
 
 /**
@@ -171,14 +214,23 @@ function showAddTagDialog() {
 function stringifyTags() {
     var tags = $('#mb-tags-area').text().split('#')
     var result = ''
+    var needComma = false
     for (var index in tags) {
-        var needComma = false
-        if (tags[index] !== '') {
-            result += `${needComma ? ',' : ''}"${tags[index]}"`
+        if (!util.isEmptyString(tags[index])) {
+            result += `${needComma ? ',' : ''}"${tags[index].trim()}"`
             needComma = true
         }
     }
     return result
+}
+
+/**
+ * 删除文档。
+ * @param {String} docname 文档目录名
+ * @return {void}
+ */
+function deleteDocument(docname) {
+    util.rmdir(`./documents/${docname}`)
 }
 
 /**
@@ -188,7 +240,7 @@ function stringifyTags() {
 function saveDocument() {
     var title = $('#mb-article-title').text()
     var meta = $('#mb-article-meta').text()
-    var hash = hashlib.SDBMHash(title)
+    var hash = util.SDBMHash(title)
     var documentName = './documents/doc-' + hash
     var infoData = `
 {
@@ -208,41 +260,58 @@ function saveDocument() {
         fs.mkdirSync(documentName, callback)
     }
     fs.writeFile(documentName + '/info.json', infoData, callback)
-    fs.writeFile(documentName + '/content.html', editor.value(), callback)
+    fs.writeFile(documentName + '/content.md', editor.value(), callback)
+}
+
+function autoAdjustEditorSize() {
+    $('.CodeMirror').css('height', `${$(document).height() - 300}px`)
+}
+
+function initContextMenu() {
+    $.contextMenu({
+        selector: '.mb-list-item',
+        callback: (key, option) => {
+            if (key === 'delete') {
+                var sender = option.$trigger
+                deleteDocument(sender.attr('name'))
+                sender.remove()
+            }
+        },
+        items: {
+            'delete': {name: '删除', icon: 'fa-trash'}
+        }
+    })
 }
 
 /**
- * 初始化文档。
+ * 初始化窗口。
  * @return {void}
  */
-function initDocument() {
-    var openingDocument = remote.app.getOpeningDocument()
-    if (openingDocument.HTMLPath !== null) {
-        fs.readFile(openingDocument.HTMLPath, 'utf-8', (error, data) => {
-            if (error) {
-                console.log(error)
-            }
-            else {
-                $('#mb-article-title').text(openingDocument.info.title)
-                $('#mb-article-meta').text(openingDocument.info.meta)
-                for (var index in openingDocument.info.tags) {
-                    addTag(openingDocument.info.tags[index])
-                }
-                editor.value(data)
-            }
-        })
-    }
+function initWindow() {
+    initContextMenu()
+    autoAdjustEditorSize()
+    $(window).resize(autoAdjustEditorSize)
 }
+
+function createDocument() {
+    $('#mb-article-title').text('标题')
+    $('#mb-article-meta').text('其他信息')
+    $('#mb-tags-area').text('')
+    editor.value('')
+    $.UIkit.offcanvas.hide()
+}
+
 
 $(() => {
     // 初始化文档
-    initDocument()
+    initWindow()
     loadDocumentNames()
     // 按钮处理
     $('#mb-sidebar-toggle').click(loadDocumentNames)
     $('#mb-save-document').click(saveDocument)
     $('#mb-show-modify-article-info-modal').click(showModifyArticleInfoModal)
     $('#mb-modify-article-info-okbutton').click(modifyArticleInfo)
-    $('#mb-add-tag-button').click(showAddTagDialog)
+    $('#mb-new-document-link').click(createDocument)
+    $('#mb-export-link').click(exportDocument)
     $('#mb-search-button').click(searchDocumentNames)
 })

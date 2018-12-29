@@ -1,5 +1,6 @@
 body, html {
     margin: 0px;
+    overflow-y: hidden;
 }
 
 input {
@@ -9,9 +10,6 @@ input {
     margin: 5px;
 }
 
-article {
-    height: 100%;
-}
 
 .mb-tag-class {
     height: 18px;
@@ -44,15 +42,8 @@ article {
     color: white;
 }
 
-#mb-editor {
-    background-color: white;
-    border: 1px solid #a0b3d6;
-    border-radius: 3px;
-    line-height: 30px;
-    font-size: 18px;
-    margin: 5px;
-}
-
-#mb-editor-toolbar {
-    margin: 5px;
+.CodeMirror {
+    line-height: 28px;
+    height: 28px;
+    font-size: 16px;
 }

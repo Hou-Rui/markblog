@@ -1,6 +1,7 @@
 // 主进程
+const path = require('path')
 const electron = require('electron')
-const {app, BrowserWindow, dialog, ipcMain} = electron
+const {app, BrowserWindow, dialog} = electron
 
 var mainWindow = null
 function createWindow() {
@@ -11,16 +12,6 @@ function createWindow() {
     mainWindow.loadURL(`file://${__dirname}/index.html`)
     mainWindow.on('closed', () => mainWindow = null)
 }
-
-var openingDocument = {
-    HTMLPath: null,
-    info: {
-        title: '',
-        meta: '',
-        tags: []
-    }
-}
-app.getOpeningDocument = () => openingDocument
 
 // 应用加载完毕
 app.on('ready', createWindow)
@@ -41,13 +32,37 @@ app.on('activate', () => {
 })
 
 // 响应渲染进程消息
-ipcMain.on('save-dialog', function (event) {
-    const options = {
-        title: '保存文件',
-        filters: [{name: 'HTML', extensions: ['html', 'htm']}]
+var openingDocument = {
+    HTMLPath: null,
+    info: {
+        title: '',
+        meta: '',
+        tags: []
     }
-    dialog.showSaveDialog(options, function (filename) {
-        event.sender.send('saved-file', filename)
+}
+
+function exportDocument() {
+    const options = {
+        title: '导出文档',
+        filters: [{name: 'HTML', extensions: ['html', 'htm', 'md']}]
+    }
+    var exportingDocument = {
+        name: '',
+        type: ''
+    }
+    dialog.showSaveDialog(options, (filename) => {
+        var extname = path.extname(filename)
+        exportingDocument.name = filename
+        if (extname === 'html' || extname === 'htm') {
+            exportingDocument.type = 'html'
+        }
+        else if (extname === 'md') {
+            exportingDocument.type = 'md'
+        }
     })
-})
+    return exportingDocument
+}
+
+app.getOpeningDocument = () => openingDocument
+app.getExportingDocument = exportDocument
 

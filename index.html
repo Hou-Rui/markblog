@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <article id="mb-article" class="uk-flex-column">
+    <article id="mb-article">
         <!-- 导航栏 -->
         <nav id="mb-navbar" class="uk-navbar">
             <a href="" class="uk-navbar-brand">MarkBlog</a>
@@ -21,30 +21,37 @@
         <p id="mb-article-meta" class="uk-article-meta">其他信息</p>
         <!-- 标签栏 -->
         <div id="mb-tag-bar" class="uk-flex">
-            <button id="mb-add-tag-button" class="uk-button uk-button-mini">
-                <i class="uk-icon-plus"></i>&nbsp;添加标签
-            </button>
             <div id="mb-tags-area" class="uk-flex"></div>
         </div>
         <!-- 工具栏 -->
-        <div id="mb-editor-toolbar" class="uk-grid-large">
+        <!--<div id="mb-editor-toolbar" class="uk-grid-large">
             <button id="mb-save-document" class="uk-button">
                 <i class="uk-icon-save"></i>&nbsp;保存
             </button>
             <button id="mb-show-modify-article-info-modal" class="uk-button">
-                <i class="uk-icon-pencil"></i>&nbsp;修改标题
+                <i class="uk-icon-pencil"></i>&nbsp;编辑文档信息
             </button>
-        </div>
-        <!-- 编辑器 -->
-        <textarea id="mb-editor"></textarea>
+        </div>-->
     </article>
+    <!-- 编辑器 -->
+    <textarea id="mb-editor"></textarea>
     <!-- 侧栏 -->
     <div id="mb-offcanvas" class="uk-offcanvas">
         <div class="uk-offcanvas-bar">
             <ul id="mb-offcanvas-nav" class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
                 <li>
+                    <a id="mb-new-document-link" href="javascript:void(0);">
+                        <i class="uk-icon-plus"></i>&nbsp;新建文档
+                    </a>
+                </li>
+                <li>
                     <a id="mb-search-link" href="javascript:void(0);" data-uk-toggle="{target:'#mb-search-panel'}">
                         <i class="uk-icon-search"></i>&nbsp;搜索文档
+                    </a>
+                </li>
+                <li>
+                    <a id="mb-export-link" href="javascript:void(0);">
+                        <i class="uk-icon-arrow-right"></i>&nbsp;导出文档
                     </a>
                 </li>
                 <div id="mb-search-panel" aria-hidden="true" class="uk-panel uk-hidden">
@@ -68,6 +75,7 @@
                 标题：<input class="uk-width-1-1" id="mb-article-title-input" type="text" />
                 <p id="mb-title-empty-msg" class="uk-alert uk-alert-danger">标题不能为空</p>
                 附加信息：<input class="uk-width-1-1" id="mb-article-meta-input" type="text" />
+                标签：<input class="uk-width-1-1" id="mb-tags-input" type="text" />
             </p>
             <button id="mb-modify-article-info-okbutton" class="uk-button uk-button-primary">完成</button>
         </div>
@@ -79,12 +87,15 @@
     <script src="lib/jquery.min.js"></script>
     <script>if (typeof module === 'object') { window.jQuery = window.$ = module.exports }</script>
     <script src="lib/uikit.min.js"></script>
+    <!-- JQuery ContextMenu -->
+    <link rel="stylesheet" href="lib/jquery.contextMenu.min.css">
+    <script src="lib/jquery.contextMenu.min.js"></script>
     <!-- SimpleMDE-->
     <link rel="stylesheet" href="node_modules/simplemde/dist/simplemde.min.css">
     <script src="node_modules/simplemde/dist/simplemde.min.js"></script>
     <!-- MarkBlog -->
-    <link rel="stylesheet" href="styles/editor.css" />
-    <script src="scripts/editor.js"></script>
+    <link rel="stylesheet" href="styles/markblog.css" />
+    <script src="scripts/markblog.js"></script>
 </body>
 
 </html>
