@@ -13,6 +13,8 @@ const arraylib = require('./scripts/arraylib.js')
 const electron = require('electron')
 const {remote} = electron
 
+var documentPath = remote.app.getPath('userData') + '/documents'
+
 var editor = new SimpleMDE({
     autofocus: true,
     autoDownloadFontAwesome: false,
@@ -76,7 +78,7 @@ function createItemClickHandler(info) {
         for (var count in info.tags) {
             addTag(info.tags[count])
         }
-        var data = fs.readFileSync(`./documents/doc-${info.hash}/content.md`, 'utf-8')
+        var data = fs.readFileSync(`${documentPath}/doc-${info.hash}/content.md`, 'utf-8')
         editor.value(data)
         $.UIkit.offcanvas.hide()
     }
@@ -91,10 +93,10 @@ function searchDocumentNames() {
     var tagsOptional = $('#mb-search-tags-optional').val().split(' ')
     var searchTitle = $('#mb-search-title').val()
     var searchResults = []
-    var files = fs.readdirSync('./documents')
+    var files = fs.readdirSync(documentPath)
     for (var fileIndex in files) {
         var docname = files[fileIndex]
-        var info = getDocumentInfo(`./documents/${docname}`)
+        var info = getDocumentInfo(`${documentPath}/${docname}`)
         if (info !== null) {
             var searchTitleRegex = new RegExp(searchTitle, 'i')
             if (searchTitleRegex.test(info.title) && arraylib.containsArray(info.tags, tagsRequired)) {
@@ -129,10 +131,10 @@ function searchDocumentNames() {
 function loadDocumentNames() {
     $('#mb-documents-list').html('')
     $('#mb-results-list').html('')
-    var files = fs.readdirSync('./documents')
+    var files = fs.readdirSync(documentPath)
     for (var fileIndex in files) {
         var docname = files[fileIndex]
-        var info = getDocumentInfo(`./documents/${docname}`)
+        var info = getDocumentInfo(`${documentPath}/${docname}`)
         if (info !== null) {
             var element = `<li><a id="mb-item-${docname}" name="${docname}" class="mb-list-item" href="javascript:void(0);">
                 ${info.title}&nbsp;&nbsp;
@@ -230,7 +232,7 @@ function stringifyTags() {
  * @return {void}
  */
 function deleteDocument(docname) {
-    util.rmdir(`./documents/${docname}`)
+    util.rmdir(`${documentPath}/${docname}`)
 }
 
 /**
@@ -241,7 +243,7 @@ function saveDocument() {
     var title = $('#mb-article-title').text()
     var meta = $('#mb-article-meta').text()
     var hash = util.SDBMHash(title)
-    var documentName = './documents/doc-' + hash
+    var documentName = `${documentPath}/doc-${hash}`
     var infoData = `
 {
     "hash": "${hash}",
@@ -283,11 +285,18 @@ function initContextMenu() {
     })
 }
 
+function checkDocumentPath() {
+    if (!fs.existsSync(documentPath)) {
+        fs.mkdirSync(documentPath)
+    }
+}
+
 /**
  * 初始化窗口。
  * @return {void}
  */
 function initWindow() {
+    checkDocumentPath()
     initContextMenu()
     autoAdjustEditorSize()
     $(window).resize(autoAdjustEditorSize)
