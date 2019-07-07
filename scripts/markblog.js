@@ -10,6 +10,7 @@ const fs = require('fs')
 const path = require('path')
 const util = require('./scripts/util.js')
 const arraylib = require('./scripts/arraylib.js')
+const exportlib = require("./scripts/exportlib.js")
 const electron = require('electron')
 const {remote} = electron
 
@@ -162,7 +163,10 @@ function exportDocument() {
         console.log(filename)
         var extname = path.extname(filename)
         if (extname === '.html') {
-            fs.writeFileSync(filename, '\ufeff' + editor.markdown(editor.value()), 'utf-8')
+            var title = $('#mb-article-title').text()
+            var meta = $('#mb-article-meta').text()
+            var htmlCode = exportlib.exportHtml(title, meta, editor.markdown(editor.value()))
+            fs.writeFileSync(filename, '\ufeff' + htmlCode, 'utf-8')
         }
         else if (extname === '.md') {
             fs.writeFileSync(filename, '\ufeff' + editor.value(), 'utf-8')
