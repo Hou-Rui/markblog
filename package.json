@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "electron .",
-    "build": "electron-packager . --overwrite --icon=markblog.icns --out=.. --platform=darwin --arch=x64 --electron-version=3.0.9"
+    "build": "electron-packager . --ignore=dev-settings --prune --asar --overwrite --icon=markblog.icns --out=.. --platform=darwin --arch=x64 --electron-version=3.0.9"
   },
   "author": "Hou Rui",
   "license": "ISC",
