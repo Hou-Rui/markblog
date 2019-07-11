@@ -1,8 +1,10 @@
-/* global SimpleMDE */
+/* eslint-disable max-lines */
 /* eslint-disable no-unused-vars */
 /* eslint-disable-next-line multiline-comment-style */
 /// <reference path="typings/index.d.ts" />
 /// <reference path="../node_modules/simplemde/src/js/simplemde.js" />
+
+/* global SimpleMDE */
 
 'use strict'
 
@@ -137,6 +139,10 @@ function loadDocumentNames() {
     }
 }
 
+/**
+ * 用对话框选择图片文件，并插入文档中。在工具栏中使用。
+ * @return {void}
+ */
 function selectImage() {
     const options = {
         title: '选择图片',
@@ -214,6 +220,12 @@ function modifyArticleInfo() {
     modal.hide()
 }
 
+/**
+ * 将标签添加到指定选择器名的jQuery对象上。
+ * @param {string} tagName 标签名
+ * @param {string} target 将标签添加到的jQuery选择器名
+ * @return {void}
+ */
 function addTag(tagName, target = '#mb-tags-area') {
     var tag = `<div class="uk-badge mb-tag-class">#${tagName.trim()}</div>&nbsp;`
     $(target).append(tag)
@@ -290,10 +302,18 @@ function saveDocument() {
     }
 }
 
+/**
+ * 自动调节CodeMirror组件大小。
+ * @return {void}
+ */
 function autoAdjustEditorSize() {
     $('.CodeMirror').css('height', `${$(document).height() - 300}px`)
 }
 
+/**
+ * 初始化右键弹出菜单。
+ * @return {void}
+ */
 function initContextMenu() {
     $.contextMenu({
         selector: '.mb-list-item',
@@ -310,6 +330,10 @@ function initContextMenu() {
     })
 }
 
+/**
+ * 检查路径目录是否存在，不存在则创建。
+ * @return {void}
+ */
 function checkDocumentPath() {
     if (!fs.existsSync(documentPath)) {
         fs.mkdirSync(documentPath)
@@ -327,6 +351,10 @@ function initWindow() {
     $(window).resize(autoAdjustEditorSize)
 }
 
+/**
+ * 创建文档，并初始化文档界面。
+ * @return {void}
+ */
 function createDocument() {
     $('#mb-article-title').text('标题')
     $('#mb-article-meta').text('其他信息')
