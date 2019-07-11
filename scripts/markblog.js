@@ -100,7 +100,7 @@ function searchDocumentNames() {
             }
         }
     }
-    var intersectCount = (x) => arraylib.intersect(x.tags, tagsOptional).length
+    var intersectCount = x => arraylib.intersect(x.tags, tagsOptional).length
     searchResults.sort((a, b) => intersectCount(b) - intersectCount(a))
     for (var index in searchResults) {
         var result = searchResults[index]
@@ -280,7 +280,7 @@ function saveDocument() {
     "tags": [${stringifyTags()}]
 }
     `
-    var callback = (error) => {
+    var callback = error => {
         if (error) {
             UIkit.notify({
                 status: 'danger',
