@@ -51,7 +51,12 @@ function getDocumentInfo(docname) {
         return JSON.parse(data)
     }
     catch (error) {
-        console.log(error)
+        UIkit.notify({
+            status: 'danger',
+            message: `获取文档信息失败<br />错误信息：${error}`,
+            timeout: 0,
+            pos: 'bottom-center'
+        })
         return null
     }
 }
@@ -277,7 +282,6 @@ function saveDocument() {
     `
     var callback = (error) => {
         if (error) {
-            console.log(error)
             UIkit.notify({
                 status: 'danger',
                 message: `保存失败<br />错误信息：${error}`,
