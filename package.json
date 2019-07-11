@@ -7,7 +7,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "electron .",
+    "test": "electron-start .",
     "build": "electron-packager . --ignore=dev-settings --prune --asar --overwrite --icon=markblog.icns --out=.. --platform=darwin --arch=x64 --electron-version=3.0.9"
   },
   "author": "Hou Rui",
