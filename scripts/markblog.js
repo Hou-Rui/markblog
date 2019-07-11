@@ -10,7 +10,9 @@ const fs = require('fs')
 const path = require('path')
 const util = require('./scripts/util.js')
 const arraylib = require('./scripts/arraylib.js')
-const exportlib = require("./scripts/exportlib.js")
+const exportlib = require('./scripts/exportlib.js')
+const {toolbar} = require('./scripts/toolbar.js')
+
 const electron = require('electron')
 const {remote} = electron
 
@@ -21,21 +23,7 @@ var editor = new SimpleMDE({
     autoDownloadFontAwesome: false,
     status: false,
     spellChecker: false,
-    toolbar: [
-        'bold', 'italic', 'heading', '|', 'quote', 'image', 'link', '|',
-        {
-            name: 'save',
-            action: _ => saveDocument(),
-            className: 'fa fa-save',
-            title: '保存'
-        },
-        {
-            name: 'edit-document-info',
-            action: _ => showModifyArticleInfoModal(),
-            className: 'fa fa-pencil',
-            title: '修改文档信息'
-        }
-    ]
+    toolbar: toolbar
 })
 
 /**
@@ -149,6 +137,21 @@ function loadDocumentNames() {
     }
 }
 
+function selectImage() {
+    const options = {
+        title: '选择图片',
+        message: '选择支持格式的图片：',
+        filters : [
+            {name: 'IMG图片', extensions: ['img']},
+            {name: 'JPEG图片', extensions: ['jpg', 'jpeg']},
+            {name: 'GIF图片', extensions: ['gif']}
+        ]
+    }
+    remote.dialog.showOpenDialog(options, filenames => {
+        editor.codemirror.replaceSelection(`![](${filenames[0]})`)
+    })
+}
+
 /**
  * 导出文档。
  * @return {void}
@@ -163,8 +166,7 @@ function exportDocument() {
             {name: 'MarkDown文档', extensions: ['md']}
         ]
     }
-    remote.dialog.showSaveDialog(options, (filename) => {
-        console.log(filename)
+    remote.dialog.showSaveDialog(options, filename => {
         var extname = path.extname(filename)
         if (extname === '.html') {
             var title = $('#mb-article-title').text()
@@ -252,6 +254,7 @@ function saveDocument() {
     var meta = $('#mb-article-meta').text()
     var hash = util.SDBMHash(title)
     var documentName = `${documentPath}/doc-${hash}`
+    var success = true
     var infoData = `
 {
     "hash": "${hash}",
@@ -263,7 +266,13 @@ function saveDocument() {
     var callback = (error) => {
         if (error) {
             console.log(error)
-            UIkit.modal.alert('文档保存失败！')
+            UIkit.notify({
+                status: 'danger',
+                message: `保存失败<br />错误信息：${error}`,
+                timeout: 0,
+                pos: 'bottom-center'
+            })
+            success = false
         }
     }
     if (!fs.existsSync(documentName)) {
@@ -271,6 +280,14 @@ function saveDocument() {
     }
     fs.writeFile(documentName + '/info.json', infoData, callback)
     fs.writeFile(documentName + '/content.md', editor.value(), callback)
+    if (success) {
+        UIkit.notify({
+            status: 'success',
+            message: '保存成功',
+            timeout: 3000,
+            pos: 'bottom-center'
+        })
+    }
 }
 
 function autoAdjustEditorSize() {
