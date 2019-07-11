@@ -153,9 +153,9 @@ function selectImage() {
         title: '选择图片',
         message: '选择支持格式的图片：',
         filters : [
-            {name: 'IMG图片', extensions: ['img']},
             {name: 'JPEG图片', extensions: ['jpg', 'jpeg']},
-            {name: 'GIF图片', extensions: ['gif']}
+            {name: 'GIF图片', extensions: ['gif']},
+            {name: 'IMG图片', extensions: ['img']}
         ]
     }
     remote.dialog.showOpenDialog(options, filenames => {
